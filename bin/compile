@@ -145,7 +145,7 @@ bpwatch stop restore_cache
 if [ ! -d $CACHE_DIR/swig ]; then
   cd $BUILD_DIR
   echo "-----> Fetching and installing SWIG 2"
-  curl -O https://jamarparris.s3.amazonaws.com/swig-2.0.5/swig.tar.gz >/dev/null 2>&1
+  curl -O https://jamarparris.s3.amazonaws.com/vendor_binaries/swig-2.0.5/swig.tar.gz >/dev/null 2>&1
   echo "-----> Installing ..."
   tar xzvf swig.tar.gz >/dev/null 2>&1
   mv swig $CACHE_DIR/swig
