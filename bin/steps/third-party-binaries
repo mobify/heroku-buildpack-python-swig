@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -e
+
+# https://devcenter.heroku.com/articles/profiled#example-profile-d-path-sh
+PROFILED_PATH="$BUILD_DIR/.profile.d"
+PROFILED_GEOS_PATH="$PROFILED_PATH/geos.sh"
+PROFILED_SWIG_PATH="$PROFILED_PATH/swig.sh"
+mkdir -p $PROFILED_PATH
+
+# Install SWIG
+if [ ! -d $CACHE_DIR/swig ]; then
+  cd $BUILD_DIR
+  echo "-----> Fetching and installing SWIG 2"
+  curl -O https://jamarparris.s3.amazonaws.com/vendor_binaries/swig-2.0.5/swig.tar.gz >/dev/null 2>&1
+  echo "-----> Installing ..."
+  tar xzvf swig.tar.gz >/dev/null 2>&1
+  mv swig $CACHE_DIR/swig
+  rm swig.tar.gz
+  echo "SWIG installed" | indent
+fi
+
+mkdir -p $BUILD_DIR/.jp_vendor
+cp -R $CACHE_DIR/swig $BUILD_DIR/.jp_vendor
+
+echo "updating path..." | indent
+PATH=$PATH:$BUILD_DIR/.jp_vendor/swig/bin/
+echo "updating PATH to $PATH" | indent
+export PATH
+echo "export PATH=$PATH" >> $PROFILED_SWIG_PATH
+
+SWIG_LIB=$BUILD_DIR/.jp_vendor/swig/share/swig/2.0.5/
+echo "setting SWIG_LIB environment var to $SWIG_LIB" | indent
+export SWIG_LIB
+echo "export SWIG_LIB=$SWIG_LIB" >> $PROFILED_SWIG_PATH
+# End Install SWIG
+
+# Install GEOS
+if [ ! -d $CACHE_DIR/geos ]; then
+  cd $BUILD_DIR
+  echo "-----> Fetching and installing GEOS"
+  curl -O https://jamarparris.s3.amazonaws.com/vendor_binaries/geos-3.3.2/geos.tar.gz >/dev/null 2>&1
+  echo "-----> Installing ..."
+  tar xzvf geos.tar.gz >/dev/null 2>&1
+  mv geos $CACHE_DIR/geos
+  rm geos.tar.gz
+  echo "GEOS installed" | indent
+fi
+
+mkdir -p $BUILD_DIR/.jp_vendor
+cp -R $CACHE_DIR/geos $BUILD_DIR/.jp_vendor
+
+if [ ! -d $CACHE_DIR/geos ]; then
+  echo "-----> GEOS directory not found in $CACHE_DIR"
+fi
+
+if [ ! -d $BUILD_DIR/.jp_vendor/geos ]; then
+  echo "-----> GEOS directory not found in $BUILD_DIR"
+fi
+
+if [ ! -f $BUILD_DIR/.jp_vendor/geos/lib/libgeos_c.so ]; then
+  echo "-----> libgeos_c.so not found in $BUILD_DIR"
+fi
+
+GEOS_LIBRARY_PATH=$BUILD_DIR/.jp_vendor/geos/lib/libgeos_c.so
+echo "setting GEOS_LIBRARY_PATH to $GEOS_LIBRARY_PATH" | indent
+export GEOS_LIBRARY_PATH
+echo "export GEOS_LIBRARY_PATH=$GEOS_LIBRARY_PATH" >> $PROFILED_GEOS_PATH
+
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BUILD_DIR/.jp_vendor/geos/lib/
+echo "updating LD_LIBRARY_PATH to $LD_LIBRARY_PATH" | indent
+export LD_LIBRARY_PATH
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $PROFILED_GEOS_PATH
+
+LIBRARY_PATH=$LIBRARY_PATH:$BUILD_DIR/.jp_vendor/geos/lib/
+echo "updating LIBRARY_PATH to $LIBRARY_PATH" | indent
+export LIBRARY_PATH
+echo "export LIBRARY_PATH=$LIBRARY_PATH" >> $PROFILED_GEOS_PATH
+
+CPATH=$CPATH:$BUILD_DIR/.jp_vendor/geos/include/
+echo "updating CPATH to $CPATH" | indent
+export CPATH
+echo "export CPATH=$CPATH" >> $PROFILED_GEOS_PATH
+# End Install GEOS
