@@ -62,7 +62,7 @@ export BUILD_DIR CACHE_DIR BIN_DIR PROFILE_PATH
 # Syntax sugar.
 source $BIN_DIR/utils
 
-# Directory Hacks for path consistiency.
+# Directory Hacks for path consistency.
 APP_DIR='/app'
 TMP_APP_DIR=$CACHE_DIR/tmp_app_dir
 
@@ -150,6 +150,12 @@ bpwatch stop restore_cache
 
 # Install Third Party external binaries
 source $BIN_DIR/steps/third-party-binaries
+
+# Ben added this, taken from https://github.com/huxley/heroku-buildpack-SWIG-python/blob/master/bin/compile
+# Install swig
+echo "setting SWIG environment variables" | indent
+set-env SWIG_FEATURES "-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
+env | fgrep SWIG | indent
 
 set +e
 # Create set-aside `.heroku` folder.
