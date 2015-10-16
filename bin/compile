@@ -167,21 +167,6 @@ echo "setting SWIG environment variables" | indent
 export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
 env | fgrep SWIG | indent
 
-# Link the openssl header files that are installed in the arch-dependent
-# directory so that they appear in the place they're expected.
-echo "Linking openssl header files"
-TARGETDIR=/usr/include/openssl
-mkdir -p $TARGETDIR
-for filename in opensslconf.h ; do
-  SOURCE=/usr/include/x86_64-linux-gnu/openssl/${filename}
-  if [ -f ${SOURCE} ] ; then
-      echo "Linking $SOURCE to $TARGETDIR"
-      ln -s $SOURCE $TARGETDIR
-  else
-      echo "Could not find $SOURCE"
-  fi
-done
-
 # Sanity check for setuptools/distribute.
 source $BIN_DIR/steps/setuptools
 
