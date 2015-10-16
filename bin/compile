@@ -151,12 +151,6 @@ bpwatch stop restore_cache
 # Install Third Party external binaries
 source $BIN_DIR/steps/third-party-binaries
 
-# Ben added this, taken from https://github.com/huxley/heroku-buildpack-SWIG-python/blob/master/bin/compile
-# Install swig
-echo "setting SWIG environment variables" | indent
-set-env SWIG_FEATURES "-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-env | fgrep SWIG | indent
-
 set +e
 # Create set-aside `.heroku` folder.
 mkdir .heroku &> /dev/null
@@ -166,6 +160,12 @@ mkdir -p $(dirname $PROFILE_PATH)
 
 # Install Python.
 source $BIN_DIR/steps/python
+
+# Ben added this, taken from https://github.com/huxley/heroku-buildpack-SWIG-python/blob/master/bin/compile
+# Install swig
+echo "setting SWIG environment variables" | indent
+set-env SWIG_FEATURES "-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
+env | fgrep SWIG | indent
 
 # Sanity check for setuptools/distribute.
 source $BIN_DIR/steps/setuptools
