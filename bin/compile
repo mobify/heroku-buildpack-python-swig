@@ -94,11 +94,27 @@ export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/
 export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
 export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
 export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
+
 # We require this to have access to installed binaries using the custom apt
 # buildpack
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
 export XMLSEC_LIBS='-L/app/.apt/usr/lib'
 export XMLSEC_CRYPTO_ENGINE='openssl'
+
+# Ben added this to get libXYZ-dev packages installed via buildpack-apt
+# to be used when Python is built.
+EXTRA_CCFLAGS="-I/app/.apt/usr/include"
+EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
+if [ -z "$CCFLAGS" ] ; then
+  export CCFLAGS="$EXTRA_CCFLAGS"
+else
+  export CCFLAGS="$CCFLAGS $EXTRA_CCFLAGS"
+fi
+if [ -z "$LDFLAGS" ] ; then
+  export LDFLAGS="$EXTRA_LDFLAGS"
+else
+  export LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
+fi
 
 # Switch to the repo's context.
 cd $BUILD_DIR
