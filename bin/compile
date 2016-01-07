@@ -86,6 +86,7 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
+echo "Setting paths for building..." | indent
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
@@ -97,12 +98,14 @@ export PKG_CONFIG_PATH=/app/.apt/usr/lib/pkg-config:/app/.heroku/vendor/lib/pkg-
 
 # We require this to have access to installed binaries using the custom apt
 # buildpack
+echo "Setting environment for xmlsec..." | indent
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
 export XMLSEC_LIBS='-L/app/.apt/usr/lib'
 export XMLSEC_CRYPTO_ENGINE='openssl'
 
 # Ben added this to get libXYZ-dev packages installed via buildpack-apt
 # to be used when Python is built.
+echo "Setting environment for building C packages..." | indent
 EXTRA_CCFLAGS="-I/app/.apt/usr/include"
 EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
 if [ -z "$CCFLAGS" ] ; then
@@ -181,7 +184,6 @@ source $BIN_DIR/steps/python
 # Install swig
 echo "setting SWIG environment variables" | indent
 export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-env | fgrep SWIG | indent
 
 # Sanity check for setuptools/distribute.
 source $BIN_DIR/steps/setuptools
