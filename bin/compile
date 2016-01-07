@@ -89,11 +89,11 @@ BUILD_DIR=$APP_DIR
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
+export C_INCLUDE_PATH=/app/.apt/usr/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
+export CPLUS_INCLUDE_PATH=/app/.apt/usr/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
+export LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
+export LD_LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
+export PKG_CONFIG_PATH=/app/.apt/usr/lib/pkg-config:/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
 
 # We require this to have access to installed binaries using the custom apt
 # buildpack
@@ -108,12 +108,12 @@ EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
 if [ -z "$CCFLAGS" ] ; then
   export CCFLAGS="$EXTRA_CCFLAGS"
 else
-  export CCFLAGS="$CCFLAGS $EXTRA_CCFLAGS"
+  export CCFLAGS="$EXTRA_CCFLAGS $CCFLAGS"
 fi
 if [ -z "$LDFLAGS" ] ; then
   export LDFLAGS="$EXTRA_LDFLAGS"
 else
-  export LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
+  export LDFLAGS="$EXTRA_LDFLAGS $LDFLAGS"
 fi
 
 # Switch to the repo's context.

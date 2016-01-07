@@ -12,12 +12,12 @@ EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
 if [ -z "$CCFLAGS" ] ; then
   export CCFLAGS="$EXTRA_CCFLAGS"
 else
-  export CCFLAGS="$CCFLAGS $EXTRA_CCFLAGS"
+  export CCFLAGS="$EXTRA_CCFLAGS $CCFLAGS "
 fi
 if [ -z "$LDFLAGS" ] ; then
   export LDFLAGS="$EXTRA_LDFLAGS"
 else
-  export LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
+  export LDFLAGS="$EXTRA_LDFLAGS $LDFLAGS"
 fi
 
 # Install dependencies with Pip.
