@@ -90,8 +90,8 @@ echo "Setting paths for building..." | indent
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.apt/usr/include/x86_64-linux-gnu:/app/.apt/usr/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export CPLUS_INCLUDE_PATH=/app/.apt/usr/include/x86_64-linux-gnu:/app/.apt/usr/include:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
+export C_INCLUDE_PATH=/app/.apt/usr/include:/app/.apt/usr/include/x86_64-linux-gnu:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
+export CPLUS_INCLUDE_PATH=/app/.apt/usr/include:/app/.apt/usr/include/x86_64-linux-gnu:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
 export LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
 export LD_LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
 export PKG_CONFIG_PATH=/app/.apt/usr/lib/pkg-config:/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
@@ -106,7 +106,7 @@ export XMLSEC_CRYPTO_ENGINE='openssl'
 # Ben added this to get libXYZ-dev packages installed via buildpack-apt
 # to be used when Python is built.
 echo "Setting environment for building C packages..." | indent
-EXTRA_CCFLAGS="-I/app/.apt/usr/include"
+EXTRA_CCFLAGS="-I/app/.apt/usr/include -I/app/.apt/usr/include/x86_64-linux-gnu"
 EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
 if [ -z "$CCFLAGS" ] ; then
   export CCFLAGS="$EXTRA_CCFLAGS"
