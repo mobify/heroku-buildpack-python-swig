@@ -5,9 +5,13 @@ source $BIN_DIR/utils
 export LIBRARY_PATH=${LIBRARY_PATH}:/app/.heroku/python/lib
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/app/.heroku/python/lib
 
-# Horrible hack to remove the static library for libgmp so that
-# the shared one is always used.
-rm -f /app/.apt/usr/lib/x86_64-linux-gnu/libgmp.a
+# Horrible hack to remove static libraries so that
+# the shared ones are used.
+for LIB in libgmp libyaml ; do
+  if [ -f /app/.apt/usr/lib/x86_64-linux-gnu/${LIB}.so ] ; then
+    rm -f /app/.apt/usr/lib/x86_64-linux-gnu/${LIB}.a
+  fi
+done
 
 # Install dependencies with Pip.
 puts-step "Installing dependencies with pip"
