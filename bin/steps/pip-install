@@ -2,23 +2,8 @@
 
 source $BIN_DIR/utils
 
-export LIBRARY_PATH=/app/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-
-# Ben added this to get libXYZ-dev packages installed via buildpack-apt
-# to be used when pip packages are compiled.
-EXTRA_CCFLAGS="-I/app/.apt/usr/include"
-EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
-if [ -z "$CCFLAGS" ] ; then
-  export CCFLAGS="$EXTRA_CCFLAGS"
-else
-  export CCFLAGS="$EXTRA_CCFLAGS $CCFLAGS "
-fi
-if [ -z "$LDFLAGS" ] ; then
-  export LDFLAGS="$EXTRA_LDFLAGS"
-else
-  export LDFLAGS="$EXTRA_LDFLAGS $LDFLAGS"
-fi
+export LIBRARY_PATH=${LIBRARY_PATH}:/app/.heroku/python/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/app/.heroku/python/lib
 
 # Install dependencies with Pip.
 puts-step "Installing dependencies with pip"

@@ -90,11 +90,16 @@ echo "Setting paths for building..." | indent
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.apt/usr/include:/app/.apt/usr/include/x86_64-linux-gnu:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export CPLUS_INCLUDE_PATH=/app/.apt/usr/include:/app/.apt/usr/include/x86_64-linux-gnu:/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export PKG_CONFIG_PATH=/app/.apt/usr/lib/pkg-config:/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/app/.apt/usr/include
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/app/.apt/usr/include
+export INCLUDE_PATH=/app/.apt/usr/include:$INCLUDE_PATH
+export LIBRARY_PATH=$LIBRARY_PATH:/app/.apt/usr/lib/x86_64-linux-gnu:/app/.apt/usr/lib/i386-linux-gnu:/app/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/.apt/usr/lib/x86_64-linux-gnu:/app/.apt/usr/lib/i386-linux-gnu:/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/app/.apt/usr/lib/x86_64-linux-gnu/pkgconfig:/app/.apt/usr/lib/pkgconfig
+export CPATH=/app/.apt/usr/include:$CPATH
+export CPPPATH=/app/.apt/usr/include:$CPPPATH
+
 
 # We require this to have access to installed binaries using the custom apt
 # buildpack
@@ -102,22 +107,6 @@ echo "Setting environment for xmlsec..." | indent
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
 export XMLSEC_LIBS='-L/app/.apt/usr/lib'
 export XMLSEC_CRYPTO_ENGINE='openssl'
-
-# Ben added this to get libXYZ-dev packages installed via buildpack-apt
-# to be used when Python is built.
-echo "Setting environment for building C packages..." | indent
-EXTRA_CCFLAGS="-I/app/.apt/usr/include -I/app/.apt/usr/include/x86_64-linux-gnu"
-EXTRA_LDFLAGS="-L/app/.apt/usr/lib"
-if [ -z "$CCFLAGS" ] ; then
-  export CCFLAGS="$EXTRA_CCFLAGS"
-else
-  export CCFLAGS="$EXTRA_CCFLAGS $CCFLAGS"
-fi
-if [ -z "$LDFLAGS" ] ; then
-  export LDFLAGS="$EXTRA_LDFLAGS"
-else
-  export LDFLAGS="$EXTRA_LDFLAGS $LDFLAGS"
-fi
 
 # Switch to the repo's context.
 cd $BUILD_DIR
