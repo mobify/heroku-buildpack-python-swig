@@ -16,7 +16,8 @@ done
 
 # Install dependencies with Pip.
 puts-step "Installing dependencies with pip"
-
+echo "setting SWIG environment variables" | indent
+export SWIG_FEATURES="-includeall -I/usr/include/${DEB_HOST_GNU_TYPE} -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
