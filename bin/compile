@@ -92,7 +92,7 @@ export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
 
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:/app/.apt/usr/include
+export C_INCLUDE_PATH=/app/.apt/usr/include:$C_INCLUDE_PATH:
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/app/.apt/usr/include
 export INCLUDE_PATH=/app/.apt/usr/include:$INCLUDE_PATH
 export LIBRARY_PATH=$LIBRARY_PATH:/app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}:/app/.apt/usr/lib/i386-linux-gnu:/app/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
