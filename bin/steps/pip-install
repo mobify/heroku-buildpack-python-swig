@@ -7,9 +7,10 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/app/.heroku/python/lib
 
 # Horrible hack to remove static libraries so that
 # the shared ones are used.
+export $(dpkg-architecture -s|sed -e s/\;//g)
 for LIB in libgmp libyaml ; do
-  if [ -f /app/.apt/usr/lib/x86_64-linux-gnu/${LIB}.so ] ; then
-    rm -f /app/.apt/usr/lib/x86_64-linux-gnu/${LIB}.a
+  if [ -f /app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}/${LIB}.so ] ; then
+    rm -f /app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}/${LIB}.a
   fi
 done
 
