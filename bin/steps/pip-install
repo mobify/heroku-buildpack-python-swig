@@ -2,9 +2,6 @@
 
 source $BIN_DIR/utils
 
-export LIBRARY_PATH=/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-
 # Install dependencies with Pip.
 puts-step "Installing dependencies with pip"
 
