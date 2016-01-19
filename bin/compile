@@ -86,16 +86,25 @@ ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
 # Prepend proper path buildpack use.
+echo "Setting paths for building..." | indent
+export $(dpkg-architecture -s|sed -e s/\;//g)
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
+
+export C_INCLUDE_PATH=/app/.apt/usr/include:$C_INCLUDE_PATH:
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/app/.apt/usr/include
+export INCLUDE_PATH=/app/.apt/usr/include:$INCLUDE_PATH
+export LIBRARY_PATH=$LIBRARY_PATH:/app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}:/app/.apt/usr/lib/i386-linux-gnu:/app/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}:/app/.apt/usr/lib/i386-linux-gnu:/app/.apt/usr/lib:$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/app/.apt/usr/lib/${DEB_HOST_GNU_TYPE}/pkgconfig:/app/.apt/usr/lib/pkgconfig
+export CPATH=/app/.apt/usr/include:$CPATH
+export CPPPATH=/app/.apt/usr/include:$CPPPATH
+
+
 # We require this to have access to installed binaries using the custom apt
 # buildpack
+echo "Setting environment for xmlsec..." | indent
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
 export XMLSEC_LIBS='-L/app/.apt/usr/lib'
 export XMLSEC_CRYPTO_ENGINE='openssl'
@@ -164,8 +173,7 @@ source $BIN_DIR/steps/python
 # Ben added this, taken from https://github.com/huxley/heroku-buildpack-SWIG-python/blob/master/bin/compile
 # Install swig
 echo "setting SWIG environment variables" | indent
-export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-env | fgrep SWIG | indent
+export SWIG_FEATURES="-includeall -I/usr/include/${DEB_HOST_GNU_TYPE} -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
 
 # Sanity check for setuptools/distribute.
 source $BIN_DIR/steps/setuptools
@@ -197,7 +205,7 @@ set-env PATH '$HOME/.apt/usr/bin:$HOME/.heroku/python/bin:$PATH'
 set-env PYTHONUNBUFFERED true
 set-env PYTHONHOME /app/.heroku/python
 set-env LIBRARY_PATH /app/.heroku/vendor/lib:/app/.heroku/python/lib
-set-env LD_LIBRARY_PATH '$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
+set-env LD_LIBRARY_PATH '$HOME/.apt/usr/lib:$HOME/.apt/usr/lib/${DEB_HOST_GNU_TYPE}:/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
 
 set-default-env LANG en_US.UTF-8
 set-default-env PYTHONHASHSEED random
