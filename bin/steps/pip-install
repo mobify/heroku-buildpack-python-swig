@@ -8,6 +8,21 @@ puts-step "Installing dependencies with pip"
 [ ! "$FRESH_PYTHON" ] && bpwatch start pip_install
 [ "$FRESH_PYTHON" ] && bpwatch start pip_install_first
 
+# This is horrible. The apt installations add .a files for certain
+# libraries. Some of them are not built with -fPIC, and so can't link
+# with the Heroku Python build. Because we now use these apt-installed libraries
+# when building for pip, we hit link failures - previously these didn't show
+# up because we apt-installed the dev library but didn't actually use it.
+# The solution is: find all the libraries in the .apt tree that have a .a
+# file *and* a .so, and remove the .a so that the .so is used instead.
+for LIB_A in $(find /app/.apt/ -name '*.a') ; do
+    LIB_SO=${LIB_A%.a}.so
+    if [ -f ${LIB_SO} ] ; then
+      echo "Removing ${LIB_A} to give precedence to ${LIB_SO}"
+      rm -f ${LIB_A}
+    fi
+done
+
 /app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
 
 # Smart Requirements handling

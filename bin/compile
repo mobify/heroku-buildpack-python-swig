@@ -110,11 +110,11 @@ for EXTRA_ROOT in /usr /usr/local ${BUILD_DIR}/.heroku/vendor ${BUILD_DIR}/.apt/
     fi
     if [ -d ${EXTRA_ROOT}/include ] ; then
         if [ -d ${EXTRA_ROOT}/include/${ARCHITECTURE} ] ; then
-            echo "Extending build environment to include Apt header files in ${EXTRA_ROOT}/include/${ARCHITECTURE}" | indent
+            echo "Extending build environment to include header files in ${EXTRA_ROOT}/include/${ARCHITECTURE}" | indent
             export C_INCLUDE_PATH=${EXTRA_ROOT}/include/${ARCHITECTURE}:${C_INCLUDE_PATH}
             export CPLUS_INCLUDE_PATH=${EXTRA_ROOT}/include/${ARCHITECTURE}:${CPLUS_INCLUDE_PATH}
         fi
-        echo "Extending build environment to include Apt header files in ${EXTRA_ROOT}/include" | indent
+        echo "Extending build environment to include header files in ${EXTRA_ROOT}/include" | indent
         export C_INCLUDE_PATH=${EXTRA_ROOT}/include:${C_INCLUDE_PATH}
         export CPLUS_INCLUDE_PATH=${EXTRA_ROOT}/include:${CPLUS_INCLUDE_PATH}
         export SWIG_INCLUDE=${C_INCLUDE_PATH}
@@ -122,12 +122,12 @@ for EXTRA_ROOT in /usr /usr/local ${BUILD_DIR}/.heroku/vendor ${BUILD_DIR}/.apt/
 
     if [ -d ${EXTRA_ROOT}/lib ] ; then
         if [ -d ${EXTRA_ROOT}/lib/${ARCHITECTURE} ] ; then
-            echo "Extending build environment to include Apt library files in ${EXTRA_ROOT}/lib/${ARCHITECTURE}" | indent
+            echo "Extending build environment to include library files in ${EXTRA_ROOT}/lib/${ARCHITECTURE}" | indent
             export LIBRARY_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${LIBRARY_PATH}
             export LD_LIBRARY_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${LD_LIBRARY_PATH}
             export PKG_CONFIG_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${PKG_CONFIG_PATH}
         fi
-        echo "Extending build environment to include Apt library files in ${EXTRA_ROOT}/lib" | indent
+        echo "Extending build environment to include library files in ${EXTRA_ROOT}/lib" | indent
         export LIBRARY_PATH=${EXTRA_ROOT}/lib:${LIBRARY_PATH}
         export LD_LIBRARY_PATH=${EXTRA_ROOT}/lib:${LD_LIBRARY_PATH}
         if [ -d ${EXTRA_ROOT}/lib/pkg-config ] ; then
