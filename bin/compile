@@ -101,6 +101,8 @@ export LD_LIBRARY_PATH=/app/.heroku/python/lib:${LD_LIBRARY_PATH}
 export PKG_CONFIG_PATH=/app/.heroku/python/lib/pkg-config:${PKG_CONFIG_PATH}
 
 ARCHITECTURE=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+# Precedence is reversed in this list: the items towards the end of the list will come earlier in
+# the flags, and thus override those that came earlier.
 for EXTRA_ROOT in /usr /usr/local ${BUILD_DIR}/.heroku/vendor ${BUILD_DIR}/.apt/usr ${BUILD_DIR}/openssl ; do
     if [ -d ${EXTRA_ROOT}/bin ] ; then
         echo "Extending PATH to include ${EXTRA_ROOT}/bin" | indent
