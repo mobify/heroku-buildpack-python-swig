@@ -135,6 +135,24 @@ for EXTRA_ROOT in ${BUILD_DIR}/.heroku/vendor ${BUILD_DIR}/.apt/usr ${BUILD_DIR}
     fi
 done
 
+for EXTRA in $(echo "$C_INCLUDE_PATH" | sed -e 's/:/ /g') ; do
+  if [ -z "${CFLAGS}" ] ; then
+    export CFLAGS="-I${EXTRA}"
+  else
+    export CFLAGS="-I${EXTRA} ${CFLAGS}"
+  fi
+done
+echo "Set CFLAGS=\"${CFLAGS}\"" | indent
+
+for EXTRA in $(echo "$LD_LIBRARY_PATH" | sed -e 's/:/ /g') ; do
+  if [ -z "${LDFLAGS}" ] ; then
+    export LDFLAGS="-L${EXTRA}"
+  else
+    export LDFLAGS="-L${EXTRA} ${LDFLAGS}"
+  fi
+done
+echo "Set LDFLAGS=\"${LDFLAGS}\"" | indent
+
 # We require this to have access to installed binaries using the custom apt
 # buildpack
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
@@ -203,8 +221,8 @@ source $BIN_DIR/steps/python
 # Install swig
 echo "setting SWIG environment variables" | indent
 export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-for INCLUDE in $(echo "$SWIG_INCLUDE" | sed -e 's/:/ /g') ; do
-  export SWIG_FEATURES="${SWIG_FEATURES} -I${INCLUDE}"
+for EXTRA in $(echo "$SWIG_INCLUDE" | sed -e 's/:/ /g') ; do
+  export SWIG_FEATURES="${SWIG_FEATURES} -I${EXTRA}"
 done
 echo "SWIG_FEATURES=${SWIG_FEATURES}" | indent
 
