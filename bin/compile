@@ -93,21 +93,47 @@ cd $BUILD_DIR
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include:${C_INCLUDE_PATH}
-export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include:${CPLUS_INCLUDE_PATH}
-export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib:${LIBRARY_PATH}
-export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib:${LD_LIBRARY_PATH}
-export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config:${PKG_CONFIG_PATH}
 
-if [ -d ${BUILD_DIR}/openssl ] ; then
-    echo "Extending build environment to include custom OpenSSL" | indent
-    export PATH=${BUILD_DIR}/openssl/bin:$PATH
-    export C_INCLUDE_PATH=${BUILD_DIR}/openssl/include:${C_INCLUDE_PATH}
-    export CPLUS_INCLUDE_PATH=${BUILD_DIR}/openssl/include:${CPLUS_INCLUDE_PATH}
-    export LIBRARY_PATH=${BUILD_DIR}/openssl/lib:${LIBRARY_PATH}
-    export LD_LIBRARY_PATH=${BUILD_DIR}/openssl/lib:${LD_LIBRARY_PATH}
-    export PKG_CONFIG_PATH=${BUILD_DIR}/openssl/lib/pkg-config:${PKG_CONFIG_PATH}
-fi
+export C_INCLUDE_PATH=/app/.heroku/python/include:${C_INCLUDE_PATH}
+export CPLUS_INCLUDE_PATH=/app/.heroku/python/include:${CPLUS_INCLUDE_PATH}
+export LIBRARY_PATH=/app/.heroku/python/lib:${LIBRARY_PATH}
+export LD_LIBRARY_PATH=/app/.heroku/python/lib:${LD_LIBRARY_PATH}
+export PKG_CONFIG_PATH=/app/.heroku/python/lib/pkg-config:${PKG_CONFIG_PATH}
+
+ARCHITECTURE=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+for EXTRA_ROOT in ${BUILD_DIR}/.heroku/vendor ${BUILD_DIR}/openssl ${BUILD_DIR}/.apt/usr ; do
+    if [ -d ${EXTRA_ROOT}/bin ] ; then
+        echo "Extending PATH to include ${EXTRA_ROOT}/bin" | indent
+        export PATH=${EXTRA_ROOT}/bin:$PATH
+    fi
+    if [ -d ${EXTRA_ROOT}/include ] ; then
+        if [ -d ${EXTRA_ROOT}/include/${ARCHITECTURE} ] ; then
+            echo "Extending build environment to include Apt header files in ${EXTRA_ROOT}/include/${ARCHITECTURE}" | indent
+            export C_INCLUDE_PATH=${EXTRA_ROOT}/include/${ARCHITECTURE}:${C_INCLUDE_PATH}
+            export CPLUS_INCLUDE_PATH=${EXTRA_ROOT}/include/${ARCHITECTURE}:${CPLUS_INCLUDE_PATH}
+        fi
+        echo "Extending build environment to include Apt header files in ${EXTRA_ROOT}/include" | indent
+        export C_INCLUDE_PATH=${EXTRA_ROOT}/include:${C_INCLUDE_PATH}
+        export CPLUS_INCLUDE_PATH=${EXTRA_ROOT}/include:${CPLUS_INCLUDE_PATH}
+        export SWIG_INCLUDE=${C_INCLUDE_PATH}
+    fi
+
+    if [ -d ${EXTRA_ROOT}/lib ] ; then
+        if [ -d ${EXTRA_ROOT}/lib/${ARCHITECTURE} ] ; then
+            echo "Extending build environment to include Apt library files in ${EXTRA_ROOT}/lib/${ARCHITECTURE}" | indent
+            export LIBRARY_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${LIBRARY_PATH}
+            export LD_LIBRARY_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${LD_LIBRARY_PATH}
+            export PKG_CONFIG_PATH=${EXTRA_ROOT}/lib/${ARCHITECTURE}:${PKG_CONFIG_PATH}
+        fi
+        echo "Extending build environment to include Apt library files in ${EXTRA_ROOT}/lib" | indent
+        export LIBRARY_PATH=${EXTRA_ROOT}/lib:${LIBRARY_PATH}
+        export LD_LIBRARY_PATH=${EXTRA_ROOT}/lib:${LD_LIBRARY_PATH}
+        if [ -d ${EXTRA_ROOT}/lib/pkg-config ] ; then
+            echo "Extending build environment to include pkg-config files in ${EXTRA_ROOT}/lib/pkg-config" | indent
+            export PKG_CONFIG_PATH=${EXTRA_ROOT}/lib/pkg-config:${PKG_CONFIG_PATH}
+        fi
+    fi
+done
 
 # We require this to have access to installed binaries using the custom apt
 # buildpack
@@ -177,10 +203,9 @@ source $BIN_DIR/steps/python
 # Install swig
 echo "setting SWIG environment variables" | indent
 export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-if [ -d ${BUILD_DIR}/openssl/include ] ; then
-    echo "Adding custom OpenSSL to SWIG" | indent
-    export SWIG_FEATURES="${SWIG_FEATURES} -I${BUILD_DIR}/openssl/include"
-fi
+for INCLUDE in $(echo "$SWIG_INCLUDE" | sed -e 's/:/ /g') ; do
+  export SWIG_FEATURES="${SWIG_FEATURES} -I${INCLUDE}"
+done
 echo "SWIG_FEATURES=${SWIG_FEATURES}" | indent
 
 # Sanity check for setuptools/distribute.
