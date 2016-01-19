@@ -205,7 +205,7 @@ set-env PATH '$HOME/.apt/usr/bin:$HOME/.heroku/python/bin:$PATH'
 set-env PYTHONUNBUFFERED true
 set-env PYTHONHOME /app/.heroku/python
 set-env LIBRARY_PATH /app/.heroku/vendor/lib:/app/.heroku/python/lib
-set-env LD_LIBRARY_PATH '$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
+set-env LD_LIBRARY_PATH '$HOME/.apt/usr/lib:$HOME/.apt/usr/lib/${DEB_HOST_GNU_TYPE}:/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
 
 set-default-env LANG en_US.UTF-8
 set-default-env PYTHONHASHSEED random
