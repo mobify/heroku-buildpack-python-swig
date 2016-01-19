@@ -47,7 +47,7 @@ export PATH=$PATH:$ROOT_DIR/vendor/pip-pop
 [ ! "$STACK" ] && STACK=$DEFAULT_PYTHON_STACK
 
 # Sanitizing environment variables.
-unset GIT_DIR PYTHONHOME PYTHONPATH LD_LIBRARY_PATH LIBRARY_PATH
+unset GIT_DIR PYTHONHOME PYTHONPATH
 
 bpwatch init $LOGPLEX_KEY
 bpwatch build python $BUILDPACK_VERSION $REQUEST_ID
@@ -85,15 +85,17 @@ bpwatch stop appdir_stage
 ORIG_BUILD_DIR=$BUILD_DIR
 BUILD_DIR=$APP_DIR
 
-# Prepend proper path buildpack use.
+# Prepend proper paths for buildpack use. We *must* preserve existing paths
+# in case earlier buildpacks have extended them.
 export PATH=$HOME/.apt/usr/bin:$BUILD_DIR/.heroku/python/bin:$BUILD_DIR/.heroku/vendor/bin:$PATH
 export PYTHONUNBUFFERED=1
 export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include
-export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib
-export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config
+export C_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include:${C_INCLUDE_PATH}
+export CPLUS_INCLUDE_PATH=/app/.heroku/vendor/include:$BUILD_DIR/.heroku/vendor/include:/app/.heroku/python/include:${CPLUS_INCLUDE_PATH}
+export LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib:${LIBRARY_PATH}
+export LD_LIBRARY_PATH=$HOME/.apt/usr/lib:/app/.heroku/vendor/lib:$BUILD_DIR/.heroku/vendor/lib:/app/.heroku/python/lib:${LD_LIBRARY_PATH}
+export PKG_CONFIG_PATH=/app/.heroku/vendor/lib/pkg-config:$BUILD_DIR/.heroku/vendor/lib/pkg-config:/app/.heroku/python/lib/pkg-config:${PKG_CONFIG_PATH}
+
 # We require this to have access to installed binaries using the custom apt
 # buildpack
 export XMLSEC_CONFIG='--prefix=/app/.apt/usr'
@@ -102,6 +104,8 @@ export XMLSEC_CRYPTO_ENGINE='openssl'
 
 # Switch to the repo's context.
 cd $BUILD_DIR
+
+echo "Build context: $(ls -a .)" | indent
 
 # Experimental pre_compile hook.
 bpwatch start pre_compile
@@ -165,7 +169,11 @@ source $BIN_DIR/steps/python
 # Install swig
 echo "setting SWIG environment variables" | indent
 export SWIG_FEATURES="-includeall -I/usr/include/x86_64-linux-gnu -I/app/.heroku/vendor/include -I$BUILD_DIR/.heroku/vendor/include -I/app/.heroku/python/include"
-env | fgrep SWIG | indent
+if [ -d ${BUILD_DIR}/openssl/include ] ; then
+    echo "Adding custom OpenSSL to SWIG" | indent
+    export SWIG_FEATURES="${SWIG_FEATURES} -I${BUILD_DIR}/openssl/include"
+fi
+echo "SWIG_FEATURES=${SWIG_FEATURES}" | indent
 
 # Sanity check for setuptools/distribute.
 source $BIN_DIR/steps/setuptools
