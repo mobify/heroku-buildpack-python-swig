@@ -15,13 +15,13 @@ puts-step "Installing dependencies with pip"
 # up because we apt-installed the dev library but didn't actually use it.
 # The solution is: find all the libraries in the .apt tree that have a .a
 # file *and* a .so, and remove the .a so that the .so is used instead.
-for LIB_A in $(find /app/.apt/ -name '*.a') ; do
-    LIB_SO=${LIB_A%.a}.so
-    if [ -f ${LIB_SO} ] ; then
-      echo "Removing ${LIB_A} to give precedence to ${LIB_SO}"
-      rm -f ${LIB_A}
-    fi
-done
+#for LIB_A in $(find /app/.apt/ -name '*.a') ; do
+#    LIB_SO=${LIB_A%.a}.so
+#    if [ -f ${LIB_SO} ] ; then
+#      echo "Removing ${LIB_A} to give precedence to ${LIB_SO}"
+#      rm -f ${LIB_A}
+#    fi
+#done
 
 /app/.heroku/python/bin/pip install -r requirements.txt --exists-action=w --src=./.heroku/src --allow-all-external  | cleanup | indent
 
